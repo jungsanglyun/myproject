@@ -1,0 +1,40 @@
+# waap
+
+
+이용방법 
+
+-목차-
+
+1번. 프로젝트 파일을 다운받기  
+2번. SQL코드 이용해서 DB구축하기  
+
+
+-------------------------------------------------------------------------------------------------
+
+1번. 프로젝트 다운받는 법 상세설명 
+
+1. https://github.com/dloere/waap4에 접속  
+2. main에서 -> master로 branch변경  
+3. code버튼 클릭하고 DownloadZip클릭해서 파일을 다운받는다.  
+4. 이클립스 File-> Open Projects from File System클릭  
+5. Directory 클릭  
+6. 다운받은 폴더 선택  
+
+(+ 1번 번외 - 이클립스 추가설정 부분)
+
+(1) 이클립스 서버를 설정하는 방법(workSpace미변경시 생략가능)  
+만약! 프로젝트를 다운받기 위해 workSpace를 변경했다면 Tomcat Server를 다시 설정해주어야한다.  
+이클립스에서 Window클릭 -> preferences클릭-> Server클릭 -> Runtime Environment클릭 -> Add클릭 -> Apache Tomcat 9.0클릭 -> Browse클릭 -> Tomcat 9.0폴더를 선택하면 된다.   
+(Tomcat 9.0 폴더는 Apache를 설치해야하는데, 설치했다면 보통 C드라이브 Program Files안에 Apache Software Foundation에 있다)
+
+(2) 글자 인코딩 (이 설정을 안하면, 이클립스에서 자바에 있는 한글이 깨지는 경우가 발생한다.)  
+Window클릭 -> preferences클릭 -> 검색창에(encoding을 입력) -> Content Types클릭 -> Text클릭 -> Default encoding에 UTF-8을 적은 후 Update클릭 -> 그 이후.. WorkSpace, CssFile, Jsp Files, Xml Files를 클릭해서 UTF-8로 바꿔준다)  
+
+2번. SQL코드를 이용해서 데이터베이스를 구축하는 법 설명  
+1. git의 main branch에 올려놓은 WAAP DB를 다운 받는다.   
+2. 오라클 DB에서 WAAP 계정을 생성해준다. ( 이미 있으면 기존 계정 삭제후 생성한다. )   
+-> 계정을 생성하는 방법은 System에서 사용자 생성 클릭 후 DBA권한을 주면 된다. - 계정은 WAAP 비밀번호는 12345  
+3. 계정을 생성한 후 해당 계정으로 접속하여 DB를 만들어 준다.
+4. 계정 접속까지 했으면 아까 다운 받은 WAAP DB를 복사 붙여넣기하여 해당 계정에서 실행하면 DB가 전부 된다.  
+5. commit하면 완료  
+
