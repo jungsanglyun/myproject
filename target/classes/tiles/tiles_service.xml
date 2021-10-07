@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
+       "http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
+
+<tiles-definitions>
+
+	<definition name="/service/serviceCustomerView"
+		extends="baseLayout">
+		<put-attribute name="title" value="1:1문의 페이지" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/service/serviceCustomerView.jsp" />
+	</definition>
+
+	<definition name="/service/FAQView" extends="baseLayout">
+		<put-attribute name="title" value="자주묻는 질문 페이지" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/service/FAQView.jsp" />
+	</definition>
+
+	<definition name="/service/serviceCustomerDetailView"
+		extends="baseLayout">
+		<put-attribute name="title" value="자주묻는 질문 페이지" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/service/serviceCustomerDetailView.jsp" />
+	</definition>
+
+	<definition name="/service/FAQViewDetail" extends="baseLayout">
+		<put-attribute name="title" value="자주묻는 질문 상세 페이지" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/service/FAQViewDetail.jsp" />
+	</definition>
+	
+	<definition name="/service/serviceCustomerWriteView" extends="baseLayout">
+		<put-attribute name="title" value="1:1문의 글 작성 페이지" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/service/serviceCustomerWriteView.jsp" />
+	</definition>
+	
+</tiles-definitions>
+       

@@ -1,0 +1,29 @@
+h2 {
+  text-align: center;
+}
+/* tr {
+  text-align: center;
+} */
+.table-responsive {
+  border-radius: 5px;
+}
+
+.cursor_test {
+  cursor: pointer;
+}
+/* .btn-outline-secondary:hover {
+  background-color: gray;
+} */
+
+textarea:focus,
+input:focus,
+input[type]:focus,
+.uneditable-input:focus {
+  border-color: gray;
+  box-shadow: none;
+  outline: none;
+}
+
+body {
+  height: 100%;
+}

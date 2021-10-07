@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
+       "http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
+<tiles-definitions>
+	
+
+	<definition name="/admin/management/mmm" extends="baseLayout">
+		<put-attribute name="title" value="WAAP 관리자 회원관리 메인페이지" />
+		<put-attribute name="body" value="/WEB-INF/views/admin/management/mmm.jsp" />
+	</definition>
+
+	<definition name="/admin/management/minfo" extends="baseLayout">
+		<put-attribute name="title" value="WAAP 관리자 회원상세정보 페이지" />
+		<put-attribute name="body" value="/WEB-INF/views/admin/management/minfo.jsp" />
+	</definition>
+	
+	<definition name="/admin/management/deportView" extends="baseLayout">
+		<put-attribute name="title" value="WAAP 관리자 회원추방 페이지" />
+		<put-attribute name="body" value="/WEB-INF/views/admin/management/deportView.jsp" />
+	</definition>
+	
+	<definition name="/admin/management/mylist" extends="baseLayout">
+		<put-attribute name="title" value="WAAP 관리자 작성 글 목록 페이지" />
+		<put-attribute name="body" value="/WEB-INF/views/admin/management/mylist.jsp" />
+	</definition>
+	
+
+</tiles-definitions>

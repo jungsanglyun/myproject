@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration 	PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+  <typeAliases>
+
+    <typeAlias type="com.waap.member.vo.MemberVO" alias="memberVO" />
+    <typeAlias type="com.waap.waap.vo.ProVO" alias="proVO" />
+   	<typeAlias type="com.waap.waap.vo.WeatherVO" alias="weatherVO" />
+   	<typeAlias type="com.waap.service.vo.ServiceCustomerVO" alias="serviceCustomerVO" />
+	<typeAlias type="com.waap.community.vo.CommunityVO" alias="CommunityVO" />
+
+  </typeAliases>
+</configuration>
+
+
+

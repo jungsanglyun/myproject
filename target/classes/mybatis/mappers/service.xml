@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+	
+<mapper namespace="mapper.service">
+
+	<select id="allServiceCustomerData" resultType="com.waap.service.vo.ServiceCustomerVO" parameterType="java.util.Map">
+		<![CDATA[
+			select * from (select serviceCustomer_code, serviceCustomer_title, serviceCustomer_content, serviceCustomer_write_date, serviceCustomer_reply, member_id, ROW_NUMBER() OVER(ORDER BY serviceCustomer_code DESC) as rn from serviceCustomer)
+			where rn between #{rowStart} and #{rowEnd}
+			order by serviceCustomer_code desc
+		]]>
+	</select>
+
+
+	<select id="serviceCustomerData" resultType="com.waap.service.vo.ServiceCustomerVO" parameterType="java.util.Map">
+		<![CDATA[
+			select * from (select serviceCustomer_code, serviceCustomer_title, serviceCustomer_content, serviceCustomer_write_date, serviceCustomer_reply, member_id, ROW_NUMBER() OVER(ORDER BY serviceCustomer_code DESC) as rn from serviceCustomer where member_id = #{member_id})
+			where rn between #{rowStart} and #{rowEnd}
+			order by serviceCustomer_code desc
+		]]>
+	</select>
+
+
+	<select id="serviceCustomerDataCount" resultType="int" parameterType="com.waap.common.base.SearchCriteria">
+		<![CDATA[
+			select count(serviceCustomer_code)
+			from serviceCustomer
+		]]>
+	
+	</select>
+
+
+	<select id="serviceCustomerDataDetail" resultType="com.waap.service.vo.ServiceCustomerVO" parameterType="java.util.Map">
+		<![CDATA[
+			select * from serviceCustomer
+			where member_id = #{member_id} and serviceCustomer_code = #{serviceCustomer_code}
+		]]>
+	</select>
+
+
+	<select id="FAQView" resultType="com.waap.service.vo.FAQVO" parameterType="com.waap.common.base.SearchCriteria">
+		<![CDATA[
+			select * from (select faq_code, faq_content, faq_reply, faq_writeDay, faq_clickCount, ROW_NUMBER() OVER(ORDER BY faq_code DESC) as rn from faq)
+			where rn between #{rowStart} and #{rowEnd}
+			order by faq_code desc
+		]]>
+	
+	</select>
+	
+	<select id="FAQViewCount" resultType="int" parameterType="com.waap.common.base.SearchCriteria">
+		<![CDATA[
+			select count(faq_code)
+			from faq
+		]]>
+	</select>
+	
+	<select id="FAQViewDetail" resultType="com.waap.service.vo.FAQVO" parameterType="int">
+		<![CDATA[
+			select * from FAQ
+			where faq_code = #{faq_code}
+		]]>
+	
+	</select>
+	
+	
+	<update id="FAQDetailClickUpdate" parameterType="int">
+		update FAQ
+		set faq_clickcount = faq_clickcount + 1
+		where faq_code = #{faq_code}		
+	</update>
+	
+	
+	<insert id="ServiceCustomerWrite" parameterType="com.waap.service.vo.ServiceCustomerVO">
+		<selectKey keyProperty="serviceCustomer_code" resultType="int" order="BEFORE">
+			SELECT serviceCustomer_code.NEXTVAL FROM DUAL
+		</selectKey>
+		<![CDATA[
+			insert into servicecustomer(
+				serviceCustomer_code,
+				servicecustomer_title,
+				serviceCustomer_content,
+				serviceCustomer_write_date,
+				member_id)
+				values(
+				#{serviceCustomer_code},
+				#{serviceCustomer_title},
+				#{serviceCustomer_content},
+				#{serviceCustomer_write_date},
+				#{member_id}
+				)
+		]]>	
+	</insert>
+	
+	
+	
+	
+	
+	<insert id="FAQWrite" parameterType="com.waap.service.vo.FAQVO">
+		<![CDATA[
+			insert into faq
+			values(faq_code.NEXTVAL, #{faq_content}, #{faq_reply}, 0, #{faq_writeDay})
+		]]>	
+		
+	</insert>
+	
+	
+	<delete id="serviceCustomerDelete" parameterType="com.waap.service.vo.ServiceCustomerVO">
+		delete from serviceCustomer
+		where serviceCustomer_code = #{serviceCustomer_code}
+	</delete>
+	
+	<update id="serviceCustomerUpdate" parameterType="com.waap.service.vo.ServiceCustomerVO">
+		update serviceCustomer set serviceCustomer_content=#{serviceCustomer_content}, serviceCustomer_title=#{serviceCustomer_title}
+		where serviceCustomer_code = #{serviceCustomer_code}
+	</update>
+
+	<delete id="FAQViewDelete" parameterType="com.waap.service.vo.FAQVO">
+		delete from FAQ
+		where faq_code = #{faq_code}
+	</delete>
+
+	<update id="FAQViewUpdate" parameterType="com.waap.service.vo.FAQVO">
+		update FAQ set faq_content=#{faq_content}, faq_reply=#{faq_reply}
+		where faq_code = #{faq_code}
+	</update>
+	
+	
+	<update id="serviceCustomerViewReply" parameterType="com.waap.service.vo.ServiceCustomerVO">
+		update serviceCustomer set serviceCustomer_reply=#{serviceCustomer_reply}
+		where serviceCustomer_code = #{serviceCustomer_code}
+	</update>
+	
+	<insert id="insertFile" parameterType="hashMap">
+		INSERT INTO SERVICECUSTOMER_FILE(
+			FILE_CODE,
+			ORG_FILE_NAME,
+			STORED_FILE_NAME,
+			FILE_SIZE,
+			SERVICECUSTOMER_CODE
+		)VALUES(
+			SERVICECUSTOMER_FILE_CODE.NEXTVAL,
+			#{ORG_FILE_NAME},
+			#{STORED_FILE_NAME},
+			#{FILE_SIZE},
+			#{SERVICECUSTOMER_CODE}
+		)
+		
+	</insert>
+	
+	
+	<select id="selectFileList" parameterType="int" resultType="hashMap">
+		SELECT FILE_CODE,
+			   ORG_FILE_NAME,
+			   ROUND(FILE_SIZE/1024,1) AS FILE_SIZE
+		  FROM SERVICECUSTOMER_FILE
+		 WHERE SERVICECUSTOMER_CODE = #{serviceCustomer_code}
+		   AND DEL_GB = 'N'  
+		 ORDER BY FILE_CODE ASC
+	</select>
+	
+	<update id="updateFile" parameterType="hashMap">
+		UPDATE SERVICECUSTOMER_FILE SET
+		DEL_GB = 'Y'
+		WHERE FILE_CODE = #{FILE_CODE}
+	</update>
+	
+	
+	<!-- 첨부파일 다운로드 -->
+	<select id="selectFileInfo" parameterType="hashMap" resultType="hashMap">
+		SELECT STORED_FILE_NAME, ORG_FILE_NAME
+		FROM SERVICECUSTOMER_FILE
+		WHERE FILE_CODE = #{FILE_CODE}
+	</select>
+
+
+</mapper>

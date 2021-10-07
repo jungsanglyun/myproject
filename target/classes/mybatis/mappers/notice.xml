@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="noticeMapper">
+	<insert id='insert' parameterType="com.waap.notice.vo.NoticeVO" useGeneratedKeys="true" keyProperty="notice_no">
+		<selectKey keyProperty="notice_no" resultType="int" order="BEFORE">
+			SELECT NOTICE_SEQ.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO NOTICE( NOTICE_NO,
+							NOTICE_TITLE,
+							NOTICE_CONT,
+							MEMBER_ID,
+							VIEW_COUNT)
+	    			VALUES(#{notice_no},
+	    				   #{notice_title},
+	    				   #{notice_cont},
+	    				   #{member_id},
+	    				   #{view_count}
+	    				   )
+	</insert>
+
+	<select id="list" resultType="com.waap.notice.vo.NoticeVO">
+		SELECT NOTICE_NO,
+			   NOTICE_TITLE,
+			   MEMBER_ID,
+			   REGDATE,
+			   VIEW_COUNT
+		FROM NOTICE
+		ORDER BY NOTICE_NO DESC
+	</select>
+	
+	
+	<select id="read" parameterType="int" resultType="com.waap.notice.vo.NoticeVO">
+		SELECT NOTICE_NO,
+			   NOTICE_TITLE,
+			   NOTICE_CONT,
+			   MEMBER_ID,
+			   REGDATE,
+			   VIEW_COUNT
+		FROM NOTICE
+		WHERE NOTICE_NO = #{notice_no}	   
+	</select>
+	
+	<!-- 글 수정 -->
+	<update id="update" parameterType="com.waap.notice.vo.NoticeVO">
+		UPDATE NOTICE
+		   SET NOTICE_TITLE = #{notice_title},
+		       NOTICE_CONT = #{notice_cont}
+		WHERE NOTICE_NO = #{notice_no}
+	</update>
+	
+	<!-- 글 삭제 -->
+	<delete id="delete" parameterType="int">
+		DELETE FROM NOTICE
+		WHERE NOTICE_NO = #{notice_no}
+	</delete>
+	
+	
+	<select id="listPage" resultType="com.waap.notice.vo.NoticeVO" parameterType="com.waap.common.base.SearchCriteria">
+		SELECT NOTICE_NO, NOTICE_TITLE, NOTICE_CONT, MEMBER_ID, REGDATE, VIEW_COUNT
+			FROM ( SELECT NOTICE_NO,
+					      NOTICE_TITLE,
+					  	  NOTICE_CONT,
+					  	  MEMBER_ID,
+					  	  REGDATE,
+					  	  VIEW_COUNT,
+					  	  ROW_NUMBER() OVER(ORDER BY NOTICE_NO DESC) AS rNUM
+			   		FROM NOTICE
+			   		WHERE 1=1		  
+						<include refid="search"></include> 	  				
+				)
+		WHERE rNUM BETWEEN #{rowStart} AND #{rowEnd}
+			ORDER BY NOTICE_NO DESC
+	</select>
+	
+	<select id="listCount" parameterType="com.waap.common.base.SearchCriteria" resultType="int">
+		SELECT COUNT(NOTICE_NO)
+		FROM NOTICE
+		WHERE 1=1		
+			<include refid="search"></include>
+	<![CDATA[	    
+			and NOTICE_NO > 0
+	]]>		   
+	</select>
+	
+	<sql id="search">
+		<if test="searchType != null">
+			<if test="searchType == 't'.toString()">AND NOTICE_TITLE LIKE '%' || #{keyword} || '%'</if>
+			<if test="searchType == 'c'.toString()">AND NOTICE_CONT LIKE '%' || #{keyword} || '%'</if>
+			<if test="searchType == 'w'.toString()">AND ADMIN LIKE '%' || #{keyword} || '%'</if>
+			<if test="searchType == 'tc'.toString()">AND (NOTICE_TITLE LIKE '%' || #{keyword} || '%') or (NOTICE_CONT LIKE '%' || #{keyword} || '%')</if>
+		</if>
+	</sql>
+	
+	<!-- 첨부파일 업로드 -->
+	<insert id="insertFile" parameterType="hashMap">
+		INSERT INTO NOTICE_FILE(
+			FILE_NO,
+			NOTICE_NO,
+			ORG_FILE_NAME,
+			STORED_FILE_NAME,
+			FILE_SIZE
+		)VALUES(
+			SEQ_NOTICE_FILE_NO.NEXTVAL,
+			#{NOTICE_NO},
+			#{ORG_FILE_NAME},
+			#{STORED_FILE_NAME},
+			#{FILE_SIZE}
+		)
+    </insert>
+    
+    <!-- 첨부파일 조회 -->
+    <select id="selectFileList" parameterType="int" resultType="hashMap">
+		SELECT FILE_NO,
+			   ORG_FILE_NAME,
+			   ROUND(FILE_SIZE/1024,1) AS FILE_SIZE
+		  FROM NOTICE_FILE
+		 WHERE NOTICE_NO = #{NOTICE_NO}
+		   AND DEL_GB = 'n'	   
+		 ORDER BY FILE_NO ASC
+	</select>
+	
+	<!-- 첨부파일 다운로드 -->
+	<select id="selectFileInfo" parameterType="hashMap" resultType="hashMap">
+		SELECT 
+			STORED_FILE_NAME,
+			ORG_FILE_NAME
+		FROM NOTICE_FILE
+		WHERE FILE_NO = #{FILE_NO}
+	</select>
+	
+	<!--  첨부파일 수정 -->
+	<update id="updateFile" parameterType="hashMap">
+		UPDATE NOTICE_FILE SET
+		DEL_GB = 'y'
+		WHERE FILE_NO = #{FILE_NO}	
+	</update>
+	
+	<!-- 게시판 조회수 -->
+	<update id="viewsCount" parameterType="int">
+		UPDATE NOTICE
+		SET VIEW_COUNT = VIEW_COUNT+1
+		WHERE NOTICE_NO = #{NOTICE_no}
+	</update>
+
+</mapper>

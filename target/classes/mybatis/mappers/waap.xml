@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+	
+<mapper namespace="mapper.waap">
+	
+	
+	
+	<select id="proView" resultType="com.waap.waap.vo.ProVO" parameterType="java.util.Map">
+	    <![CDATA[
+			select p.*, ps.*, pd.* from pro p, pro_sub ps, pro_div pd
+			where p.pro_sub_code = ps.pro_sub_code and ps.pro_div_code = pd.pro_div_code
+			and pd.pro_div_code = #{pro_div_code}
+			and	p.pro_period between to_date(#{start_day}, 'YY-MM-DD') and to_date(#{end_day}, 'YY-MM-DD')
+			and p.pro_area = #{pro_area}
+		]]>
+	</select>
+	
+	
+	<select id="weatherView" resultType="com.waap.waap.vo.WeatherVO" parameterType="java.util.Map" >
+	    <![CDATA[
+			select * from weather
+			where weather_period between to_date(#{start_day}, 'YY-MM-DD') and to_date(#{end_day}, 'YY-MM-DD')
+			and weather_area = #{weather_area}
+		]]>
+	</select>
+	
+	
+	
+	
+
+</mapper>

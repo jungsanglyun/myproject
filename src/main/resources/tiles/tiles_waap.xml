@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
+       "http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
+       
+<tiles-definitions>
+      
+	  <definition name="/waap/rankView" extends="baseLayout">
+         <put-attribute name="title" value="순위정보 페이지" />
+         <put-attribute name="body" value="/WEB-INF/views/waap/rankView.jsp" />
+      </definition> 
+  
+  	  <definition name="/waap/priceView" extends="baseLayout">
+         <put-attribute name="title" value="기상 농산물 정보 페이지" />
+         <put-attribute name="body" value="/WEB-INF/views/waap/priceView.jsp" />
+      </definition>
+      
+      
+       
+  
+</tiles-definitions>

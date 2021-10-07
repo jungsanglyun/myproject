@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="communityMapper">
+	<insert id='insert' parameterType="com.waap.community.vo.CommunityVO" useGeneratedKeys="true" keyProperty="com_no">
+		<selectKey keyProperty="com_no" resultType="int" order="BEFORE">
+			SELECT COM_WRITE_SEQ.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO COM_WRITE( COM_NO,
+							   COM_TITLE,
+							   COM_CONTENT,
+							   MEMBER_ID,
+							   VIEW_COUNT,
+							   REPLY_COUNT)
+	    				VALUES(#{com_no},
+	    					   #{com_title}, 
+	    					   #{com_content}, 
+	    					   #{member_id}, 
+	    					   #{view_count}, 
+	    					   #{reply_count}
+	    					   )
+	</insert>
+	
+	<select id="read" parameterType="int" resultType="com.waap.community.vo.CommunityVO">
+		SELECT COM_NO,
+			   COM_TITLE,
+			   COM_CONTENT,
+			   MEMBER_ID,
+			   REGDATE,
+			   MODIFYDATE,
+			   VIEW_COUNT
+		FROM COM_WRITE
+		WHERE COM_NO = #{com_no}	   
+	</select>
+	
+	<!-- 글 수정 -->
+	<update id="update" parameterType="com.waap.community.vo.CommunityVO">
+		UPDATE COM_WRITE
+		   SET COM_TITLE = #{com_title},
+		       COM_CONTENT = #{com_content},
+		       MODIFYDATE = SYSDATE
+		WHERE COM_NO = #{com_no}
+	</update>
+	
+	<!-- 글 삭제 -->
+	<delete id="delete" parameterType="int">
+		DELETE FROM COM_WRITE
+		WHERE COM_NO = #{com_no}
+	</delete>
+	
+	
+	<select id="listPage" resultType="com.waap.community.vo.CommunityVO" parameterType="com.waap.common.base.SearchCriteria">
+		SELECT COM_NO, COM_TITLE, COM_CONTENT, MEMBER_ID, REGDATE, VIEW_COUNT, REPLY_COUNT
+			FROM ( SELECT COM_NO,
+					      COM_TITLE,
+					  	  COM_CONTENT,
+					  	  MEMBER_ID,
+					  	  REGDATE,
+					  	  VIEW_COUNT,
+					  	  REPLY_COUNT,
+					  	  ROW_NUMBER() OVER(ORDER BY COM_NO DESC) AS rNUM
+			   		FROM COM_WRITE
+			   		WHERE 1=1		  
+						<include refid="search"></include> 	  				
+				)
+		WHERE rNUM BETWEEN #{rowStart} AND #{rowEnd}
+			ORDER BY COM_NO DESC
+	</select>
+	
+	<select id="listCount" parameterType="com.waap.common.base.SearchCriteria" resultType="int">
+		SELECT COUNT(COM_NO)
+		FROM COM_WRITE
+		WHERE 1=1		
+			<include refid="search"></include>
+	<![CDATA[	    
+			and COM_NO > 0
+	]]>		   
+	</select>
+	
+	<sql id="search">
+		<if test="searchType != null">
+			<if test="searchType == 't'.toString()">AND COM_TITLE LIKE '%' || #{keyword} || '%'</if>
+			<if test="searchType == 'c'.toString()">AND COM_CONTENT LIKE '%' || #{keyword} || '%'</if>
+			<if test="searchType == 'w'.toString()">AND MEMBER_ID LIKE '%' || #{keyword} || '%'</if>
+			<if test="searchType == 'tc'.toString()">AND (COM_TITLE LIKE '%' || #{keyword} || '%') or (COM_CONTENT LIKE '%' || #{keyword} || '%')</if>
+		</if>
+	</sql>
+	
+	<!-- 첨부파일 업로드 -->
+	<insert id="insertFile" parameterType="hashMap">
+		INSERT INTO COM_FILE(
+			FILE_NO,
+			COM_NO,
+			ORG_FILE_NAME,
+			STORED_FILE_NAME,
+			FILE_SIZE
+		)VALUES(
+			SEQ_COM_FILE_NO.NEXTVAL,
+			#{COM_NO},
+			#{ORG_FILE_NAME},
+			#{STORED_FILE_NAME},
+			#{FILE_SIZE}
+		)
+    </insert>
+    
+    <!-- 첨부파일 조회 -->
+    <select id="selectFileList" parameterType="int" resultType="hashMap">
+		SELECT FILE_NO,
+			   ORG_FILE_NAME,
+			   ROUND(FILE_SIZE/1024,1) AS FILE_SIZE
+		  FROM COM_FILE
+		 WHERE COM_NO = #{COM_NO}
+		   AND DEL_GB = 'n'	   
+		 ORDER BY FILE_NO ASC
+	</select>
+	
+	<!-- 첨부파일 다운로드 -->
+	<select id="selectFileInfo" parameterType="hashMap" resultType="hashMap">
+		SELECT 
+			STORED_FILE_NAME,
+			ORG_FILE_NAME
+		FROM COM_FILE
+		WHERE FILE_NO = #{FILE_NO}
+	</select>
+	
+	<!--  첨부파일 수정 -->
+	<update id="updateFile" parameterType="hashMap">
+		UPDATE COM_FILE SET
+		DEL_GB = 'y'
+		WHERE FILE_NO = #{FILE_NO}	
+	</update>
+	
+	<!-- 게시판 조회수 -->
+	<update id="viewsCount" parameterType="int">
+		UPDATE COM_WRITE 
+		SET VIEW_COUNT = VIEW_COUNT+1
+		WHERE COM_NO = #{com_no}
+	</update>
+	
+	<!-- 댓글 개수 -->
+	<update id="updateReplyCount" parameterType="int">
+		UPDATE COM_WRITE C
+		SET C.REPLY_COUNT = ( SELECT COUNT(REPLY_NO)
+							  FROM COM_REPLY
+							  WHERE COM_NO = #{com_no} )
+		WHERE C.COM_NO = #{com_no}			  
+	</update>
+	
+	<!-- 최신글 정렬 -->
+	<select id="list_last" resultType="com.waap.community.vo.CommunityVO">
+		SELECT COM_NO,
+			   COM_TITLE,
+			   MEMBER_ID,
+			   REGDATE,
+			   VIEW_COUNT,
+			   REPLY_COUNT
+		FROM COM_WRITE
+		ORDER BY REGDATE DESC
+	</select>
+	
+	<select id="last_listPage" resultType="com.waap.community.vo.CommunityVO" parameterType="com.waap.common.base.SearchCriteria">
+		SELECT COM_NO, COM_TITLE, COM_CONTENT, MEMBER_ID, REGDATE, VIEW_COUNT, REPLY_COUNT
+			FROM ( SELECT COM_NO,
+					      COM_TITLE,
+					  	  COM_CONTENT,
+					  	  MEMBER_ID,
+					  	  REGDATE,
+					  	  VIEW_COUNT,
+					  	  REPLY_COUNT,
+					  	  ROW_NUMBER() OVER(ORDER BY REGDATE DESC) AS rNUM
+			   		FROM COM_WRITE
+			   		WHERE 1=1	  
+						<include refid="search"></include> 	  				
+				)
+		WHERE rNUM BETWEEN #{rowStart} AND #{rowEnd}
+			ORDER BY REGDATE DESC
+	</select>
+	
+	<!-- 인기글 정렬 -->
+	<select id="list_count" resultType="com.waap.community.vo.CommunityVO">
+		SELECT COM_NO,
+			   COM_TITLE,
+			   MEMBER_ID,
+			   REGDATE,
+			   VIEW_COUNT,
+			   REPLY_COUNT
+		FROM COM_WRITE
+		ORDER BY VIEW_COUNT DESC
+	</select>
+	
+	<select id="count_listPage" resultType="com.waap.community.vo.CommunityVO" parameterType="com.waap.common.base.SearchCriteria">
+		SELECT COM_NO, COM_TITLE, COM_CONTENT, MEMBER_ID, REGDATE, VIEW_COUNT, REPLY_COUNT
+			FROM ( SELECT COM_NO,
+					      COM_TITLE,
+					  	  COM_CONTENT,
+					  	  MEMBER_ID,
+					  	  REGDATE,
+					  	  VIEW_COUNT,
+					  	  REPLY_COUNT,
+					  	  ROW_NUMBER() OVER(ORDER BY VIEW_COUNT DESC) AS rNUM
+			   		FROM COM_WRITE
+			   		WHERE 1=1		  
+						<include refid="search"></include> 	  				
+				)
+		WHERE rNUM BETWEEN #{rowStart} AND #{rowEnd}
+			ORDER BY VIEW_COUNT DESC
+	</select>
+	
+	<!-- 마이페이지 내가 쓴 글 조회-->
+	<select id="mylist" resultType="com.waap.community.vo.CommunityVO" parameterType="java.util.Map">
+		SELECT COM_NO, COM_TITLE, COM_CONTENT, MEMBER_ID, REGDATE, MODIFYDATE
+			FROM ( SELECT COM_NO,
+					      COM_TITLE,
+					  	  COM_CONTENT,
+					  	  MEMBER_ID,
+					  	  REGDATE,
+					  	  MODIFYDATE,
+					  	  ROW_NUMBER() OVER(ORDER BY COM_NO DESC) AS rNUM
+			   		FROM COM_WRITE
+			   		WHERE MEMBER_ID = #{member_id}
+						<include refid="search"></include> 	  				
+				)
+		WHERE rNUM BETWEEN #{rowStart} AND #{rowEnd}
+			ORDER BY COM_NO DESC
+	</select>
+	
+	 
+	<select id="mylistCount" parameterType="java.util.Map" resultType="int">
+		SELECT COUNT(COM_NO)
+		FROM COM_WRITE
+		WHERE MEMBER_ID = #{member_id}		
+			<include refid="search"></include>
+	<![CDATA[	    
+			and COM_NO > 0
+	]]>		   
+	</select>
+	
+	
+	
+</mapper>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+       "-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
+       "http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
+<tiles-definitions>
+	
+	
+	<definition name="/notice/list" extends="baseLayout">
+		<put-attribute name="title" value="WAAP 공지사항 목록페이지" />
+		<put-attribute name="body" value="/WEB-INF/views/notice/list.jsp" />
+	</definition>
+	
+	<definition name="/notice/readView" extends="baseLayout">
+		<put-attribute name="title" value="WAAP 공지사항 조회페이지" />
+		<put-attribute name="body" value="/WEB-INF/views/notice/readView.jsp" />
+	</definition>
+	
+</tiles-definitions>

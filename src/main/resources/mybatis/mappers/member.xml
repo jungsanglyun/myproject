@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mapper.member">
+
+
+	<select id="login" resultType="com.waap.member.vo.MemberVO"
+		parameterType="java.util.Map">
+	    <![CDATA[
+			select * from member
+			where member_id=#{member_id}
+			and member_pw=#{member_pw}			
+			 
+		]]>
+	</select>
+
+	<insert id="insertNewMember"
+		parameterType="com.waap.member.vo.MemberVO">
+		insert into member(
+		member_code,
+		member_id,
+		member_pw,
+		member_name,
+		member_gender,
+		member_hp,
+		member_hp2,
+		member_hp3,
+		member_birth_y,
+		member_birth_m,
+		member_birth_d,
+		member_email,
+		member_email2,
+		member_zonecode,
+		member_roadaddress,
+		member_remainingaddress,
+		member_joinDay
+		)
+		values(
+		member_code.NEXTVAL,
+		#{member_id},
+		#{member_pw},
+		#{member_name},
+		#{member_gender},
+		#{member_hp},
+		#{member_hp2},
+		#{member_hp3},
+		#{member_birth_y}, 
+		#{member_birth_m},
+		#{member_birth_d},
+		#{member_email},
+		#{member_email2},
+		#{member_zonecode},
+		#{member_roadAddress},
+		#{member_remainingAddress},
+		#{member_joinDay}		
+		)
+	</insert>
+
+
+	<select id="idCheck" parameterType="String" resultType="int">
+		select count(*) from member where member_id = #{member_id}
+	</select>
+
+	<select id="adminMemberControlView" resultType="com.waap.member.vo.MemberVO">
+		select * from member
+		order by member_code desc
+	</select>
+
+	<select id="emailAndNameCheck" resultType="com.waap.member.vo.MemberVO" parameterType="java.util.Map">
+		select * from member
+		where member_email = #{member_email} and member_email2 = #{member_email2} and member_name = #{member_name}	
+	</select>
+
+	<select id="emailAndIdCheck" resultType="com.waap.member.vo.MemberVO" parameterType="java.util.Map">
+		select * from member
+		where member_email = #{member_email} and member_email2 = #{member_email2} and member_id = #{member_id}
+	</select>
+
+
+
+	<!-- 칠용님 코드 -->
+	<!--  -->
+	<!--  -->
+
+
+	<!-- 내정보목록 -->
+	<select id="list" resultType="com.waap.member.vo.MemberVO">
+		SELECT MEMBER_ID, MEMBER_PW, MEMBER_NAME, MEMBER_GENDER, MEMBER_HP, MEMBER_HP2, MEMBER_HP3, MEMBER_EMAIL, MEMBER_EMAIL2, MEMBER_ZONECODE,
+			   MEMBER_ROADADDRESS, MEMBER_REMAININGADDRESS, MEMBER_BIRTH_Y, MEMBER_BIRTH_M, MEMBER_BIRTH_D
+		FROM MEMBER
+	</select>
+	
+	<!-- 회원관리 회원정보 -->
+	<select id="member_info" resultType="com.waap.member.vo.MemberVO" parameterType="com.waap.member.vo.MemberVO">
+		SELECT MEMBER_ID, MEMBER_PW, MEMBER_NAME, MEMBER_GENDER, MEMBER_HP, MEMBER_HP2, MEMBER_HP3, MEMBER_EMAIL, MEMBER_EMAIL2, MEMBER_ZONECODE,
+			   MEMBER_ROADADDRESS, MEMBER_REMAININGADDRESS, MEMBER_BIRTH_Y, MEMBER_BIRTH_M, MEMBER_BIRTH_D
+		FROM MEMBER
+		WHERE MEMBER_ID = #{member_id}
+	</select>
+	
+	<!-- 내정보 수정 -->
+	<update id="update" parameterType="com.waap.member.vo.MemberVO">
+		UPDATE MEMBER
+		   SET MEMBER_ID = #{member_id},
+		   	   MEMBER_PW = #{member_pw},
+		   	   MEMBER_NAME = #{member_name},
+		   	   MEMBER_HP = #{member_hp},
+		   	   MEMBER_HP2 = #{member_hp2},
+		   	   MEMBER_HP3 = #{member_hp3},
+		   	   MEMBER_BIRTH_Y = #{member_birth_y},
+		   	   MEMBER_BIRTH_M = #{member_birth_m},
+		   	   MEMBER_BIRTH_D = #{member_birth_d},
+		   	   MEMBER_GENDER = #{member_gender},
+		   	   MEMBER_EMAIL = #{member_email},
+		   	   MEMBER_EMAIL2 = #{member_email2},
+		   	   MEMBER_ZONECODE = #{member_zonecode},
+		   	   MEMBER_ROADADDRESS = #{member_roadAddress},
+		   	   MEMBER_REMAININGADDRESS = #{member_remainingAddress}
+		   WHERE MEMBER_ID = #{member_id}
+	</update>
+	
+	<!-- 비밀번호 체크 -->
+	<select id="passChk" resultType="int">
+		SELECT COUNT(*) FROM MEMBER
+		WHERE MEMBER_ID = #{member_id}
+		 AND  MEMBER_PW = #{member_pw}
+	</select>
+	
+	<!-- 회원 탈퇴 -->
+	<delete id="withdrawal">
+		DELETE FROM MEMBER
+		WHERE MEMBER_ID = #{member_id}
+		 AND  MEMBER_PW = #{member_pw}
+	</delete>
+	
+	<!-- 회원 추방 -->
+	<delete id="deport">
+		DELETE FROM MEMBER
+		WHERE MEMBER_ID = #{member_id}
+	</delete>
+	
+	<!-- 회원관리 회원정보 -->
+	<select id="management_list" resultType="com.waap.member.vo.MemberVO" parameterType="com.waap.common.base.SearchCriteria">
+		SELECT MEMBER_CODE, MEMBER_ID, MEMBER_JOINDAY
+			FROM ( SELECT MEMBER_CODE,
+			 			  MEMBER_ID,
+			 			  MEMBER_JOINDAY,
+					  	  ROW_NUMBER() OVER(ORDER BY MEMBER_CODE DESC) AS rNUM
+			   		FROM MEMBER
+			   		WHERE 1=1		  
+						<include refid="search"></include> 	  				
+				)
+		WHERE rNUM BETWEEN #{rowStart} AND #{rowEnd}
+			ORDER BY MEMBER_CODE DESC
+	</select>
+	
+	
+	
+	
+	
+	
+	<select id="listCount" parameterType="com.waap.common.base.SearchCriteria" resultType="int">
+		SELECT COUNT(MEMBER_CODE)
+		FROM MEMBER
+		WHERE 1=1	
+			<include refid="search"></include>
+	<![CDATA[	    
+			and MEMBER_CODE > 0
+	]]>		   
+	</select>
+	
+	<sql id="search">
+		<if test="searchType != null">
+			<if test="searchType == 'w'.toString()">AND MEMBER_ID LIKE '%' || #{keyword} || '%'</if>
+		</if>
+	</sql>
+
+
+
+</mapper>
